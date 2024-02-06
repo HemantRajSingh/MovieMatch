@@ -67,6 +67,31 @@ def scrape_movies_content(year):
 
     df = pd.DataFrame({'Movie Title': titles, 'Plot Summary': summaries, 'Cover Image': cover_images, 'Year': year, 'Source': wikipedia_links})
 
+
+    # CREATE TABLE Movie (
+    #     id SERIAL PRIMARY KEY,
+    #     title VARCHAR(255) NOT NULL,
+    #     plot TEXT,
+    #     year INT,
+    #     genres VARCHAR(255),
+    #     director VARCHAR(255),
+    #     actors TEXT,
+    #     imdb_rating FLOAT,
+    #     release_date DATE,
+    #     running_time INT,
+    #     language VARCHAR(100),
+    #     country VARCHAR(100),
+    #     production_company VARCHAR(255),
+    #     awards TEXT,
+    #     trailer_url VARCHAR(255),
+    #     poster_image_url VARCHAR(255)
+    # );
+    
+    # get movie attributes for the above column and insert those into movie database using postgres.
+    # Create methods to connect to postgres db
+
+
+
     path = f'./dataset/movie_list_{year}.csv'
     export_csv(df, path)    
 
