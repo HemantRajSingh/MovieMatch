@@ -97,6 +97,42 @@ def scrape_movies_content(year):
     # export_csv(df, path)    
     
     return movies
+
+
+def scrape_movie_data(all_links):
+    #all_links = ['https://en.wikipedia.org/wiki/The_Last_of_Us_(TV_series)', 'https://en.wikipedia.org/wiki/Friends','https://en.wikipedia.org/wiki/Modern_Family']
+    dfs = []
+
+    for i in all_links:
+        table_GDP = pd.read_html(i, match='Genre')
+        df_transposed = table_GDP[0].T.reset_index().rename(columns={'index': 'Movie_name'})
+        
+    
+        
+        dfs.append(df_transposed)
+        
+  
+
+    df_result = pd.concat(dfs, ignore_index=True)
+    
+    return df_result
+
+def data_preprocessing(df_transposed):
+    df_transposed.drop(columns={0},inplace=True)# dropping the column with all null values 
+
+    columns_name=df_transposed.iloc[0].tolist() #get the name of the columns
+    columns_name
+
+    #rename the name of columns
+    for i in range (len(columns_name)):
+        df_transposed.rename(columns={i:columns_name[i]}, inplace=True)
+
+    df_transposed.drop(0,inplace=True)
+    df_transposed= df_transposed[::2]
+    
+    df_transposed.reset_index(drop=True,inplace=True)
+    
+    return df_transposed
         
 
 def export_to_csv(df, path):
@@ -105,8 +141,15 @@ def export_to_csv(df, path):
 # for year in range(2000, 2024):
 #     movies_data = scrape_movies_content(year)
 
+
+
+
 movies_data = scrape_movies_content(2023)
 insert_movies(movies_data)
+
+
+movie_details= scrape_movie_data()
+data_preprocessing(movie_details)
 
     
 
