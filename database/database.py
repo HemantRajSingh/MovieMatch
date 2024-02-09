@@ -1,4 +1,52 @@
 import psycopg2
+from db_config import load_config
+
+database_name = 'moviematch'
+def initialize_database():
+    try:
+        connection = psycopg2.connect(**load_config())
+        connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = connection.cursor()
+
+        # Check if the database exists
+        cursor.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{database_name}'")
+        exists = cursor.fetchone()
+
+        # If the database doesn't exist, create it
+        if not exists:
+            cursor.execute(f"CREATE DATABASE {database_name}")
+            connection.commit()
+            print("Database 'moviematch' created successfully.")
+
+        # Switch to moviematch database
+        cursor.execute(f"set search_path='{database_name}'")
+        connection.commit()
+
+        # Create the Movie table if not exists
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS Movie (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                plot TEXT,
+                cover_image_url VARCHAR(255),
+                year INT,
+                source_url VARCHAR(100),
+                trailer_link VARCHAR(255)
+            )
+        ''')
+        connection.commit()
+
+        print("Table 'Movie' created successfully.")
+    except psycopg2.Error as e:
+        print("Error:", e)
+    finally:
+        # Close the database connection
+        if connection:
+            connection.close()
+
+
+# Call the function to initialize the database and table
+initialize_database()
 
 def connect():
     try:
@@ -12,16 +60,16 @@ def connect():
     except psycopg2.Error as e:
         print("Error:", e)
 
-def insert_movie(title, plot, cover_image_url, year, source, trailer_link):
+def insert_movie(title, plot, cover_image_url, year, source_url, trailer_link):
     connection = connect()
     if connection:
         try:
             cursor = connection.cursor()
 
             cursor.execute('''
-                INSERT INTO Movie (title, plot, cover_image_url, year, source, trailer_link)
+                INSERT INTO Movie (title, plot, cover_image_url, year, source_url, trailer_link)
                 VALUES (%s, %s, %s, %s, %s, %s)
-            ''', (title, plot, cover_image_url, year, source, trailer_link))
+            ''', (title, plot, cover_image_url, year, source_url, trailer_link))
 
             connection.commit()
 
@@ -45,7 +93,7 @@ def insert_movies(movies):
             cursor = connection.cursor()
 
             cursor.executemany('''
-                INSERT INTO Movie (title, plot, cover_image_url, year, source, trailer_link)
+                INSERT INTO Movie (title, plot, cover_image_url, year, source_url, trailer_link)
                 VALUES (%s, %s, %s, %s, %s, %s)
             ''', movies)
 
