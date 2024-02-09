@@ -3,24 +3,11 @@ from db_config import load_config
 
 database_name = 'moviematch'
 def initialize_database():
+    connection = None
     try:
         connection = psycopg2.connect(**load_config())
         connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = connection.cursor()
-
-        # Check if the database exists
-        cursor.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{database_name}'")
-        exists = cursor.fetchone()
-
-        # If the database doesn't exist, create it
-        if not exists:
-            cursor.execute(f"CREATE DATABASE {database_name}")
-            connection.commit()
-            print("Database 'moviematch' created successfully.")
-
-        # Switch to moviematch database
-        cursor.execute(f"set search_path='{database_name}'")
-        connection.commit()
 
         # Create the Movie table if not exists
         cursor.execute('''
@@ -30,6 +17,18 @@ def initialize_database():
                 plot TEXT,
                 cover_image_url VARCHAR(255),
                 year INT,
+                rated VARCHAR(50),
+                released_date DATE,
+                runtime VARCHAR(50),
+                genre VARCHAR(255),
+                director VARCHAR(255),
+                writer VARCHAR(255),
+                actors VARCHAR(255),
+                language VARCHAR(100),
+                country VARCHAR(100),
+                awards VARCHAR(255),
+                imdb_rating FLOAT,
+                imdb_id VARCHAR(50),
                 source_url VARCHAR(100),
                 trailer_link VARCHAR(255)
             )
@@ -40,36 +39,35 @@ def initialize_database():
     except psycopg2.Error as e:
         print("Error:", e)
     finally:
-        # Close the database connection
         if connection:
             connection.close()
 
-
-# Call the function to initialize the database and table
-initialize_database()
-
 def connect():
     try:
-        connection = psycopg2.connect(
-            user='postgres',
-            password='procit',
-            host='localhost',
-            database='moviematch'
-        )
+        connection = psycopg2.connect(**load_config())
         return connection
     except psycopg2.Error as e:
         print("Error:", e)
 
-def insert_movie(title, plot, cover_image_url, year, source_url, trailer_link):
+def insert_movie(movie):
     connection = connect()
     if connection:
         try:
             cursor = connection.cursor()
 
             cursor.execute('''
-                INSERT INTO Movie (title, plot, cover_image_url, year, source_url, trailer_link)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            ''', (title, plot, cover_image_url, year, source_url, trailer_link))
+                INSERT INTO Movie (
+                    title, plot, cover_image_url, year, rated, released_date, runtime, genre,
+                    director, writer, actors, language, country, awards,
+                    imdb_rating, imdb_id, source_url, trailer_link
+                )
+                VALUES (
+                    %(title)s, %(plot)s, %(cover_image_url)s, %(year)s, %(rated)s, %(released_date)s,
+                    %(runtime)s, %(genre)s, %(director)s, %(writer)s, %(actors)s, %(language)s,
+                    %(country)s, %(awards)s, %(imdb_rating)s, %(imdb_id)s,
+                    %(source_url)s, %(trailer_link)s
+                )
+            ''', movie)
 
             connection.commit()
 
@@ -79,13 +77,6 @@ def insert_movie(title, plot, cover_image_url, year, source_url, trailer_link):
         finally:
             connection.close()
             
-# Example usage:
-# movies_to_insert = [
-#     ('Title1', 'Plot1', 'Image1.jpg', 2022, 'Source1', 'Trailer1'),
-#     ('Title2', 'Plot2', 'Image2.jpg', 2023, 'Source2', 'Trailer2'),
-#     # Add more entries as needed
-# ]
-# insert_movies(movies_to_insert)
 def insert_movies(movies):
     connection = connect()
     if connection:
@@ -93,8 +84,16 @@ def insert_movies(movies):
             cursor = connection.cursor()
 
             cursor.executemany('''
-                INSERT INTO Movie (title, plot, cover_image_url, year, source_url, trailer_link)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO Movie (
+                    title, plot, cover_image_url, year, rated, released_date, runtime, genre,
+                    director, writer, actors, language, country, awards,
+                    imdb_rating, imdb_id, source_url, trailer_link
+                )
+                VALUES (
+                    %(title)s, %(plot)s, %(cover_image_url)s, %(year)s, %(rated)s, %(released_date)s, %(runtime)s, %(genre)s,
+                    %(director)s, %(writer)s, %(actors)s, %(language)s, %(country)s, %(awards)s,
+                    %(imdb_rating)s, %(imdb_id)s, %(source_url)s, %(trailer_link)s
+                )
             ''', movies)
 
             connection.commit()
@@ -104,4 +103,8 @@ def insert_movies(movies):
             print("Error:", e)
         finally:
             connection.close()
+            
+if __name__ == "__main__":
+    # Initialize the database
+    initialize_database()
 

@@ -6,7 +6,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from tqdm import tqdm 
 
-from database.database import insert_movies
+from imdb import IMDb
+imdb = IMDb()
+
+from database.database import initialize_database, insert_movies
 
 root = 'https://en.wikipedia.org'
 
@@ -34,10 +37,6 @@ def scrape_movie_list(year):
     return all_links
 
 def scrape_movies_content(year):
-    titles=[]
-    summaries=[]
-    cover_images = []
-    wikipedia_links=[]
     all_movies=scrape_movie_list(year)
     movies = []
     
@@ -45,15 +44,32 @@ def scrape_movies_content(year):
         source_url = f"{root}/{movie_url}"
         content=fetch(source_url)
         soup=BeautifulSoup(content,'html.parser')
+        
+        
+        plot = None
+        year = None
+        rated = None
+        released_date = None
+        runtime = None
+        genre = None
+        director = None
+        writer = None
+        actors = None
+        language = None
+        country = None
+        awards = None
+        cover_image_url = None
+        imdb_rating = None
+        imdb_id = None 
+        trailer_link = None
+        
         title = soup.find('h1',id='firstHeading').get_text()
         info_box = image_tag = soup.find('table', class_='infobox vevent')
-        cover_image_url = None
         if info_box:
             image_tag = info_box.find('img')
         if image_tag:
             cover_image_url = image_tag.get('src').lstrip('//')
-
-        plot = ''
+        
         for e in soup.findAll('h2'):
             k=e.text
             if k.startswith('Plot'):
@@ -64,38 +80,36 @@ def scrape_movies_content(year):
                         plot = s.get_text().strip()
                         plot += plot + '\n'
 
-        titles.append(title)
-        summaries.append(plot)
-        cover_images.append(cover_image_url)
-        wikipedia_links.append(source_url)
-        movies.append((title, plot, cover_image_url, year, source_url, ''))
-
-    # df = pd.DataFrame({'Movie Title': titles, 'Plot Summary': summaries, 'Cover Image': cover_images, 'Year': year, 'Source': wikipedia_links})
-
-    # CREATE TABLE Movie (
-    #     id SERIAL PRIMARY KEY,
-    #     title VARCHAR(255) NOT NULL,
-    #     plot TEXT,
-    #     year INT,
-    #     genres VARCHAR(255),
-    #     director VARCHAR(255),
-    #     actors TEXT,
-    #     imdb_rating FLOAT,
-    #     release_date DATE,
-    #     running_time INT,
-    #     language VARCHAR(100),
-    #     country VARCHAR(100),
-    #     production_company VARCHAR(255),
-    #     awards TEXT,
-    #     trailer_url VARCHAR(255),
-    #     poster_image_url VARCHAR(255)
-    # );
-    # get movie attributes for the above column and insert those into movie database using postgres.
-    # Create methods to connect to postgres db
-
-    # path = f'./dataset/movie_list_{year}.csv'
-    # export_csv(df, path)    
-    
+        # get the extra movie details from imdb which aren't available on wikipedia
+        movie_imdb_search = imdb.search_movie(title)
+        if movie_imdb_search:
+            movie_imdb = movie_imdb_search[0]
+            imdb.update(movie_imdb)
+            
+            movie_details = {
+                'title': title,
+                'plot': plot,
+                'cover_image_url': cover_image_url or movie_imdb.get('cover url'),
+                'year': movie_imdb.get('year'),
+                'rated': movie_imdb.get('certificates') if movie_imdb.get('certificates') else None,
+                'released_date': movie_imdb.get('original air date'),
+                'runtime': movie_imdb.get('runtimes')[0] if movie_imdb.get('runtimes') else None,
+                'genre': ', '.join(movie_imdb.get('genres')) if movie_imdb.get('genres') else None,
+                'director': ', '.join([d.get('name') for d in movie_imdb.get('directors')]) if movie_imdb.get('directors') else None,
+                'writer': ', '.join([str(w) for w in movie_imdb.get('writers')]) if movie_imdb.get('writers') else None,
+                'actors': ', '.join([a.get('name') for a in movie_imdb.get('cast')[:5]]) if movie_imdb.get('cast') else None,
+                'language': ', '.join(movie_imdb.get('languages')) if movie_imdb.get('languages') else None,
+                'country': ', '.join(movie_imdb.get('countries')) if movie_imdb.get('countries') else None,
+                'awards': movie_imdb.get('awards'),
+                'imdb_rating': movie_imdb.get('rating'),
+                'imdb_id': movie_imdb.get('imdbID'),
+                'source_url': source_url,
+                'trailer_link': movie_imdb.get('videos')[0] if movie_imdb.get('videos') else None
+            }
+            print(movie_details)
+            movies.append(movie_details)
+                
+            insert_movies(movies)
     return movies
 
 
@@ -138,8 +152,12 @@ def data_preprocessing(df_transposed):
 def export_to_csv(df, path):
     export_csv(df, path)
 
-# for year in range(2000, 2024):
+# Call the function to initialize the database and table
+initialize_database()
+
+# for year in range(2020, 2024):
 #     movies_data = scrape_movies_content(year)
+#     insert_movies(movies_data)
 
 
 
@@ -148,8 +166,8 @@ movies_data = scrape_movies_content(2023)
 insert_movies(movies_data)
 
 
-movie_details= scrape_movie_data()
-data_preprocessing(movie_details)
+# movie_details= scrape_movie_data()
+# data_preprocessing(movie_details)
 
     
 
