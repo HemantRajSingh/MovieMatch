@@ -6,16 +6,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords
+from pathlib import Path
 
 
 app = Flask(__name__)
 
+root_dir = Path(__file__).resolve().parent.parent
 # Load the TF-IDF vectorizer and cosine similarity matrix
-vectorizer = joblib.load('../models/tfidf_vectorizer.pkl')
-cosine_similarities = joblib.load('../models/cosine_similarities.pkl')
+vectorizer = joblib.load(root_dir / 'models/tfidf_vectorizer.pkl')
+cosine_similarities = joblib.load(root_dir / 'models/cosine_similarities.pkl')
 
 # Load the preprocessed dataset
-df = pd.read_csv('../data/processed/preprocessed_dataset.csv')
+df = pd.read_csv(root_dir / 'data/processed/preprocessed_dataset.csv')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
