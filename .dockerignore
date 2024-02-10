@@ -1,0 +1,2 @@
+data/raw/*
+!data/raw/movies_dataset_2000_2023.csv
