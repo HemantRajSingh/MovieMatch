@@ -18,5 +18,19 @@
             <button type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
+
+    {% if suggestions %}
+        <h2>Suggested Movies:</h2>
+        <ul>
+            {% for movie in suggestions %}
+                <li>
+                    <strong>{{ movie['Movie Title'] }}</strong><br>
+                    <img src="https://{{ movie['Cover Image'] }}" alt="{{ movie['Movie Title'] }} Image" style="max-width: 200px; max-height: 300px;"><br>
+                    Genre: {{ movie['Genre'] }}<br>
+                    Release Year: {{ movie['Year'] }}<br>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </body>
 </html>
