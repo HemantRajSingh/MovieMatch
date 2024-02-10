@@ -6,7 +6,7 @@
     <title>MovieMatch: Personalized Movie Recommendations</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- Include Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha256-Mc5F4sZ7/67fA+Ud/RAZL+RHZLR5K6cZL3rRQ+uxTkk=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <h1>MovieMatch</h1>
@@ -14,7 +14,7 @@
     <form method="post" action="/">
         <h3 for="user_input">Enter movie description, genre, or mood:</h3>
         <div class="search-container">
-            <input type="text" name="user_input" placeholder="Search..." value="{{ request.form.get('user_input') }}" required>
+            <input type="text" name="user_input" placeholder="Search..." value="{{ request.form.get('user_input', default='') }}" required>
             <button type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
