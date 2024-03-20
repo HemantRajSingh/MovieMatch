@@ -80,6 +80,6 @@ years = list(range(2020, 2025))
 df = pd.DataFrame()
 for year in years:
     movies = get_movies(year)
-    df = df.append(pd.DataFrame(movies))
+    df.concat(pd.DataFrame(movies))
 
 df.to_csv('imdb_movies.csv', index=False)
