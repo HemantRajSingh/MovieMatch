@@ -68,17 +68,18 @@ def get_movies(year):
     movie_list = []
     for movie in movies:
         movie_list.append(get_movie_info(movie))
-        
-    print('Total movies scraped:', len(movie_list))
-    df = pd.DataFrame(movie_list)
-    df.to_csv(f'imdb_movies_{year}.csv', index=False)
+    print('Year:', year, 'Movies scraped:', len(movie_list))
+    # df = pd.DataFrame(movie_list)
+    # df.to_csv(f'imdb_movies_{year}.csv', index=False)
     return movie_list
 
 
-# create url for year 2020 - 2024
-years = list(range(2020, 2025))
+from tqdm import tqdm
+
+# create url for year 2000 - 2025
+years = list(range(2000, 2025))
 df = pd.DataFrame()
-for year in years:
+for year in tqdm(years):
     movies = get_movies(year)
     df = pd.concat([df, pd.DataFrame(movies)])
 
