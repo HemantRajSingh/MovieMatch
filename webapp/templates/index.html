@@ -9,28 +9,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <h1>MovieMatch</h1>
-    <h2>Personalized Movie Recommendations</h2>
-    <form method="post" action="/">
-        <h3 for="user_input">Enter movie description, genre, or mood:</h3>
-        <div class="search-container">
-            <input type="text" name="user_input" placeholder="Search..." value="{{ request.form.get('user_input', default='') }}" required>
-            <button type="submit"><i class="fas fa-search"></i></button>
+    <header>
+        <div class="logo">
+            <span class="logo-text">Movie<span class="match">Match</span></span>
         </div>
-    </form>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/popular">Popular</a></li>
+                <li><a href="/recent">Recent</a></li>
+            </ul>
+        </nav>
+        <div class="search-container" id="searchContainer">
+            <form method="post" action="/" id="searchForm">
+                <input type="text" name="user_input" placeholder="Search..." value="{{ request.form.get('user_input', default='') }}" required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+        <button id="searchButton"><i class="fas fa-search"></i></button>
+    
+    </header>
+    <main>
+        <form method="post" action="/">
+            <h3 for="user_input">Enter movie description, genre, or mood:</h3>
+            <div class="search-container">
+                <input type="text" name="user_input" placeholder="Search..." value="{{ request.form.get('user_input', default='') }}" required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
 
-    {% if suggestions %}
-        <h2>Suggested Movies:</h2>
-        <ul>
-            {% for movie in suggestions %}
-                <li>
-                    <strong>{{ movie['Movie Title'] }}</strong><br>
-                    <img src="https://{{ movie['Cover Image'] }}" alt="{{ movie['Movie Title'] }} Image" style="max-width: 200px; max-height: 300px;"><br>
-                    Genre: {{ movie['Genre'] }}<br>
-                    Release Year: {{ movie['Year'] }}<br>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        {% if suggestions %}
+            <h2>Suggested Movies:</h2>
+            <ul>
+                {% for movie in suggestions %}
+                    <li>
+                        <strong>{{ movie['Movie Title'] }}</strong><br>
+                        <img src="https://{{ movie['Cover Image'] }}" alt="{{ movie['Movie Title'] }} Image" style="max-width: 200px; max-height: 300px;"><br>
+                        Genre: {{ movie['Genre'] }}<br>
+                        Release Year: {{ movie['Year'] }}<br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+    <footer>
+        <p>© 2024 MovieMatch. All rights reserved.</p>
+    </footer>
 </body>
 </html>

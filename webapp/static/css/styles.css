@@ -46,3 +46,46 @@ li {
     margin: 10px;
     text-align: center;
 }
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.logo img {
+    height: 50px;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.search-container {
+    display: flex;
+}
+
+.logo {
+    font-size: xxx-large;
+}
+
+.logo-text {
+    font-weight: 800;  /* Make the text bolder */
+}
+
+.match {
+    color: #FF5733;
+}
