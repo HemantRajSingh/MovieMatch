@@ -44,9 +44,9 @@
                 {% for movie in suggestions %}
                     <li>
                         <strong>{{ movie['Movie Title'] }}</strong><br>
-                        <img src="https://{{ movie['Cover Image'] }}" alt="{{ movie['Movie Title'] }} Image" style="max-width: 200px; max-height: 300px;"><br>
-                        Genre: {{ movie['Genre'] }}<br>
-                        Release Year: {{ movie['Year'] }}<br>
+                        <img src="{{ movie['image_link'] }}" alt="{{ movie['title'] }} Image" style="max-width: 200px; max-height: 300px;"><br>
+                        Genre: {{ movie['genre'] }}<br>
+                        Release Year: {{ movie['year'] }}<br>
                     </li>
                 {% endfor %}
             </ul>

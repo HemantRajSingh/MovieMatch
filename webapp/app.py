@@ -36,7 +36,7 @@ def get_movie_suggestions(user_input):
     user_input_tfidf = vectorizer.transform([user_input])
     user_cosine_similarities = cosine_similarity(user_input_tfidf, tfidf_matrix).flatten()
     similar_movies_indices = user_cosine_similarities.argsort()[:-10:-1]
-    suggestions = df.iloc[similar_movies_indices][['Movie Title', 'Cover Image', 'Genre', 'Year']].to_dict('records')
+    suggestions = df.iloc[similar_movies_indices][['title', 'image_link', 'genre', 'year']].to_dict('records')
 
     return suggestions
 
