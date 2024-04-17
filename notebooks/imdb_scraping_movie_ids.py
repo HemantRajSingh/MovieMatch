@@ -12,24 +12,24 @@ from selenium.common.exceptions import TimeoutException
 import time
 
 def create_url(year):
-    return f'https://www.imdb.com/search/title/?title_type=feature&user_rating=7,&year={year}&num_votes=1000&countries=US'
+    return f'https://www.imdb.com/search/title/?title_type=feature&user_rating=6,&year={year}&countries=US'
 
 def get_movie_info(movie):
     title = movie.find('a', class_='ipc-title-link-wrapper')
     id = title['href'].split('/')[2]
-    year = movie.find('span', class_='dli-title-metadata-item').text
-    runtime = movie.find('span', class_='dli-title-metadata-item').text
-    rating = movie.find('span', class_='ratingGroup--imdb-rating').text
-    votes = movie.find('span', class_='ipc-rating-star--voteCount').text
-    plot = movie.find('div', class_='ipc-html-content-inner-div').text
+    year = movie.find('span', class_='dli-title-metadata-item')
+    runtime = movie.find('span', class_='dli-title-metadata-item')
+    rating = movie.find('span', class_='ratingGroup--imdb-rating')
+    votes = movie.find('span', class_='ipc-rating-star--voteCount')
+    plot = movie.find('div', class_='ipc-html-content-inner-div')
     return {
         'id': id,
-        'title': title.text,
-        'year': year,
-        'runtime': runtime,
-        'rating': rating,
-        'votes': votes,
-        'plot': plot
+        'title': title.text if title else '',
+        'year': year.text if year else '',
+        'runtime': runtime.text if runtime else '',
+        'rating': rating.text if rating else '',
+        'votes': votes.text if votes else '',
+        'plot': plot.text if plot else ''
     }
     
 def get_movies(year):
@@ -69,8 +69,6 @@ def get_movies(year):
     for movie in movies:
         movie_list.append(get_movie_info(movie))
     print('Year:', year, 'Movies scraped:', len(movie_list))
-    # df = pd.DataFrame(movie_list)
-    # df.to_csv(f'imdb_movies_{year}.csv', index=False)
     return movie_list
 
 
@@ -78,9 +76,9 @@ from tqdm import tqdm
 
 # create url for year 2000 - 2025
 years = list(range(2000, 2025))
-df = pd.DataFrame()
+all_movies = []
 for year in tqdm(years):
     movies = get_movies(year)
-    df = pd.concat([df, pd.DataFrame(movies)])
-
+    all_movies.extend(movies)
+df = pd.DataFrame(all_movies)
 df.to_csv('imdb_movies.csv', index=False)
