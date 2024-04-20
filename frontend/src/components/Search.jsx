@@ -43,13 +43,16 @@ export function Search() {
         <DialogFooter>
           <Button
             type="submit"
-            onClick={() =>
-              fetchRecommendations(query, {
-                onSuccess: (res) => {
-                  setIsDialogOpen(false);
-                },
-              })
-            }
+            onClick={() => {
+              fetchRecommendations(
+                { query },
+                {
+                  onSuccess: (res) => {
+                    setIsDialogOpen(false);
+                  },
+                }
+              );
+            }}
           >
             Search
           </Button>
