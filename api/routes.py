@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify 
 from flask_cors import CORS
 
 
@@ -25,7 +25,7 @@ knn_model = joblib.load(root_dir / 'models/knn_model.pkl')
 movie_embeddings = np.load(root_dir / 'models/movie_embeddings.npy', allow_pickle=True)
 
 # Load the preprocessed dataset
-df = pd.read_csv(root_dir / 'data/processed/preprocessed_dataset.csv')
+df = pd.read_csv(root_dir / 'data/merged/imdb_movies_min_votes_500.csv')
 
 model_name = "embeddings"
 
@@ -58,8 +58,8 @@ def get_recommendations():
 
     cosine_similarities = cosine_similarity([user_input_embeddings], movie_embeddings).flatten()
     similar_movies_indices = cosine_similarities.argsort()[:-10:-1]
-    suggestions = df.iloc[similar_movies_indices].to_dict('records')
-    return jsonify(suggestions)
+    # suggestions = df.iloc[similar_movies_indices].to_json(orient='records')
+    return df.iloc[similar_movies_indices].to_json(orient='records')
 
 def text_to_embeddings(text):
     tokens = process_query(text)
