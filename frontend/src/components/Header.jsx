@@ -18,13 +18,19 @@ const Header = () => {
           </div>
           <div class="hidden lg:flex lg:gap-x-12">
             <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
-              Browse
-            </a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
               New
             </a>
             <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+              Trending
+            </a>
+            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
               Popular
+            </a>
+            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+              Top Rated
+            </a>
+            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+              Browse
             </a>
           </div>
           <div class="hidden lg:flex lg:flex-1 lg:justify-end">
