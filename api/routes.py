@@ -78,26 +78,26 @@ def get_recommendations():
 
     cosine_similarities = cosine_similarity([user_input_embeddings], movie_embeddings).flatten()
     similar_movies_indices = cosine_similarities.argsort()[:-10:-1]
-    return Response(df.iloc[similar_movies_indices].to_json(orient='records'), mimetype='application/json')
+    return df.iloc[similar_movies_indices].to_json(orient='records')
 
 @app.route('/browse/', methods=['GET'])
 def browse_movies():
-    return Response(df[:60].to_json(orient="records"), mimetype='application/json')
+    return df[:60].to_json(orient="records")
 
 @app.route('/top_rated_movies/', methods=['GET'])
 def top_rated_movies():
     top_rated = df.sort_values(by='rating', ascending=False).head(10)
-    return Response(top_rated[:60].to_json(orient='records'), mimetype='application/json')
+    return top_rated[:60].to_json(orient='records')
 
 @app.route('/latest_movies/', methods=['GET'])
 def latest_movies():
     latest = df.sort_values(by='year', ascending=False).head(10)
-    return Response(latest[:60].to_json(orient='records'), minetype='application/json')
+    return latest[:60].to_json(orient='records')
 
 @app.route('/popular_movies/', methods=['GET'])
 def popular_movies():
     popular = df.sort_values(by='rating_count', ascending=False).head(10)
-    return Response(popular[:60].to_json(orient='records'), minetype='application/json')
+    return popular[:60].to_json(orient='records')
 
 @app.route('/trending_movies/', methods=['GET'])
 def trending_movies():
@@ -106,7 +106,7 @@ def trending_movies():
     trending = df.sort_values(by=['year', 'rating_count'], ascending=[False, False]).head(10)
     # convert trending to dictionary and return
     
-    return Response(trending[:60].to_json(orient='records'), minetype='application/json')
+    return trending[:60].to_json(orient='records')
 
 
 if __name__ == '__main__':
