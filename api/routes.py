@@ -69,7 +69,7 @@ def set_model():
     return {'status': 'success'}
 
 
-@app.route('/recommendations/', methods=['POST', 'OPTIONS'])
+@app.route('/recommendations/', methods=['POST'])
 def get_recommendations():
     user_input = request.json.get('query', '')
     user_input_embeddings = text_to_embeddings(user_input)
@@ -101,12 +101,8 @@ def popular_movies():
 
 @app.route('/trending_movies/', methods=['GET'])
 def trending_movies():
-    # You can implement trending logic based on your criteria
-    # For example, movies that gained the most rating counts in the last week
     trending = df.sort_values(by=['year', 'rating_count'], ascending=[False, False]).head(10)
-    # convert trending to dictionary and return
-    
-    return Response(trending[:60].to_json(orient='records'), minetype='application/json')
+    return Response(trending[:60].to_json(orient='records'), mimetype='application/json')
 
 
 if __name__ == '__main__':
