@@ -1,9 +1,12 @@
+import { useQuery } from 'react-query';
 import Header from '../components/Header';
 import MovieList from '../components/MovieList';
 import { useMovieContext } from '../context/movieContext';
+import { getTrending } from '../services/api';
 
 const Home = () => {
   const { recommendations } = useMovieContext();
+  const { data } = useQuery('trending', getTrending);
 
   return (
     <div>
@@ -19,7 +22,7 @@ const Home = () => {
           <MovieList
             title="Trending"
             subtitle=" Top trends for you. Updated daily."
-            movieList={[]}
+            movieList={data ? data : []}
           />
         )}
       </div>
