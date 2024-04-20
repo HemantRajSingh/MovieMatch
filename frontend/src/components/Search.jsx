@@ -1,3 +1,4 @@
+import { useMovieContext } from '../context/movieContext';
 import { Button } from '../components/ui/button';
 import {
   Dialog,
@@ -9,10 +10,19 @@ import {
   DialogTrigger,
 } from '../components/ui/dialog';
 import { Textarea } from '../components/ui/textarea';
+import { useState } from 'react';
 
-export function Search() {
+export function Search({ dialogState }) {
+  const [query, setQuery] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(dialogState);
+  const { fetchRecommendations } = useMovieContext();
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
       <DialogTrigger asChild>
         <Button>Search</Button>
       </DialogTrigger>
@@ -30,10 +40,23 @@ export function Search() {
           <Textarea
             placeholder="Enter keywords, phrases, or themes to explore movies with plots that resonate with your interests."
             className="resize-none min-h-[150px]"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
         <DialogFooter>
-          <Button type="submit">Search</Button>
+          <Button
+            type="submit"
+            onClick={() =>
+              fetchRecommendations(query, {
+                onSuccess: (res) => {
+                  setIsDialogOpen(false);
+                },
+              })
+            }
+          >
+            Search
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
