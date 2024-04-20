@@ -11,11 +11,13 @@ import {
 } from '../components/ui/dialog';
 import { Textarea } from '../components/ui/textarea';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Search() {
   const [query, setQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState();
   const { fetchRecommendations } = useMovieContext();
+  const navigate = useNavigate();
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={(open) => setIsDialogOpen(open)}>
@@ -48,6 +50,7 @@ export function Search() {
                 { query },
                 {
                   onSuccess: (res) => {
+                    navigate('/');
                     setIsDialogOpen(false);
                   },
                 }
