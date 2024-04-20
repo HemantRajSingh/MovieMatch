@@ -14,20 +14,52 @@ from nltk.corpus import stopwords
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 root_dir = Path(__file__).resolve().parent.parent
 
 # load models
 vectorizer = joblib.load(root_dir / 'models/tfidf_vectorizer.pkl')
-glove_embeddings = np.load(root_dir / 'models/glove_embeddings.npy', allow_pickle=True)
 knn_model = joblib.load(root_dir / 'models/knn_model.pkl')
 movie_embeddings = np.load(root_dir / 'models/movie_embeddings.npy', allow_pickle=True)
 
 # Load the preprocessed dataset
 df = pd.read_csv(root_dir / 'data/merged/imdb_movies_min_votes_500.csv')
+df = df.drop(['genre', 'keywords', 'actors', 'director', 'synopsis', 'summary'], axis=1)
+
 
 model_name = "embeddings"
+glove_file = root_dir / 'models/glove.6B.100d.txt'
+
+embedding_size = 100
+word_embeddings = {}
+with open(glove_file, 'r', encoding='utf-8') as f:
+    for line in f:
+        values = line.split()
+        word = values[0]
+        embedding = np.array(values[1:], dtype='float32')
+        word_embeddings[word] = embedding
+        
+def text_to_embeddings(text):
+    words = text.split()
+    embeddings = np.zeros(embedding_size)
+    count = 0
+    for word in words:
+        if word in word_embeddings:
+            embeddings += word_embeddings[word]
+            count += 1
+    if count != 0:
+        embeddings /= count
+    return embeddings
+
+def process_query(query):
+    query = query.lower()
+    tokens = nltk.word_tokenize(query)
+    tokens = [token for token in tokens if token not in stopwords.words('english')]
+    lemmatizer = nltk.WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(token) for token in tokens]
+
+    return tokens
 
 @app.route('/api/select_model', methods=['POST'])
 def set_model():
@@ -36,68 +68,42 @@ def set_model():
     return {'status': 'success'}
 
 
-@app.route('/recommendations/<query>', methods=['GET'])
-def get_movie_recommendations(query):
-    vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform(df['ProcessedPlot'])
-    user_input_tfidf = vectorizer.transform([query])
-    user_cosine_similarities = cosine_similarity(user_input_tfidf, tfidf_matrix).flatten()
-    similar_movies_indices = user_cosine_similarities.argsort()[:-10:-1]
-    suggestions = df.iloc[similar_movies_indices].to_dict('records')
-    return jsonify(suggestions)
-
-@app.route('/recommendations/', methods=['POST'])
+@app.route('/recommendations/', methods=['POST', 'OPTIONS'])
 def get_recommendations():
-    # get movie recommendations using cosine similarity between glove embeddings and user input embeddings
     user_input = request.json.get('query', '')
-
-    # Get the embedding for each word and handle missing values
     user_input_embeddings = text_to_embeddings(user_input)
     if len(user_input_embeddings) == 0:
-        return jsonify([])  # Return empty recommendations if no valid embeddings found
+        return jsonify([])  
 
     cosine_similarities = cosine_similarity([user_input_embeddings], movie_embeddings).flatten()
     similar_movies_indices = cosine_similarities.argsort()[:-10:-1]
-    # suggestions = df.iloc[similar_movies_indices].to_json(orient='records')
     return df.iloc[similar_movies_indices].to_json(orient='records')
-
-def text_to_embeddings(text):
-    tokens = process_query(text)
-    word_embeddings = [glove_embeddings[word] for word in tokens if word in glove_embeddings]
-    if len(word_embeddings) == 0:
-        return None
-    embeddings = np.mean(word_embeddings, axis=0)
-    return embeddings
-
-def process_query(query):
-    # Tokenize the query
-    query = query.lower()
-    tokens = nltk.word_tokenize(query)
-
-    # Remove stopwords
-    tokens = [token for token in tokens if token not in stopwords.words('english')]
-
-    # Lemmatize the tokens
-    lemmatizer = nltk.WordNetLemmatizer()
-    tokens = [lemmatizer.lemmatize(token) for token in tokens]
-
-    return tokens
-
-def text_to_embeddings(text):
-    words = text.split()
-    embeddings = np.zeros(100)
-    count = 0
-    for word in words:
-        if word in glove_embeddings:
-            embeddings += glove_embeddings[word]
-            count += 1
-    if count != 0:
-        embeddings /= count
-    return embeddings
 
 @app.route('/browse', methods=['GET'])
 def browse_movies():
-    return jsonify(df.to_dict('records'))
+    return jsonify(df[:60].to_dict('records'))
+
+@app.route('/top_rated_movies', methods=['GET'])
+def top_rated_movies():
+    top_rated = df.sort_values(by='rating', ascending=False).head(10)
+    return jsonify(top_rated[:60].to_dict('records'))
+
+@app.route('/latest_movies', methods=['GET'])
+def latest_movies():
+    latest = df.sort_values(by='year', ascending=False).head(10)
+    return jsonify(latest[:60].to_dict('records'))
+
+@app.route('/popular_movies', methods=['GET'])
+def popular_movies():
+    popular = df.sort_values(by='rating_count', ascending=False).head(10)
+    return jsonify(df[:60].to_dict('records'))
+
+@app.route('/trending_movies', methods=['GET'])
+def trending_movies():
+    # You can implement trending logic based on your criteria
+    # For example, movies that gained the most rating counts in the last week
+    trending = df.sort_values(by=['year', 'rating_count'], ascending=[False, False]).head(10)
+    return jsonify(trending[:60].to_dict('records'))
 
 
 if __name__ == '__main__':
