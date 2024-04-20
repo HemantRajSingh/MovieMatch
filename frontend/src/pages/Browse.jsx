@@ -17,6 +17,9 @@ import {
   PopoverTrigger,
 } from '../components/ui/popover';
 import Header from '../components/Header';
+import { browseMovies } from '../services/api';
+import { useQuery } from 'react-query';
+import MovieList from '../components/MovieList';
 
 const frameworks = [
   {
@@ -42,13 +45,14 @@ const frameworks = [
 ];
 
 const Browse = () => {
+  const { data } = useQuery('latest', browseMovies);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
   return (
     <>
       <Header />
       <div className="flex max-w-7xl p-6 mx-auto mt-3">
-        <div className="flex gap-8">
+        {/* <div className="flex gap-8">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -239,7 +243,13 @@ const Browse = () => {
               </Command>
             </PopoverContent>
           </Popover>
-        </div>
+        </div> */}
+
+        <MovieList
+          title="Browse"
+          subtitle="Browse Movies"
+          movieList={data ? data : []}
+        />
       </div>
     </>
   );
