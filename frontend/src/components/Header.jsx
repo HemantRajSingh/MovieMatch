@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search } from './Search';
 
 const Header = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
   return (
     <div>
       <header class="bg-white">
@@ -28,8 +30,11 @@ const Header = () => {
               Popular
             </a>
           </div>
-          <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            <Search />
+          <div
+            class="hidden lg:flex lg:flex-1 lg:justify-end"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Search dialogState={isDialogOpen} />
           </div>
         </nav>
       </header>
