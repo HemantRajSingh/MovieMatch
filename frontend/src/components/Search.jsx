@@ -12,18 +12,14 @@ import {
 import { Textarea } from '../components/ui/textarea';
 import { useState } from 'react';
 
-export function Search({ dialogState }) {
+export function Search() {
   const [query, setQuery] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(dialogState);
+  const [isDialogOpen, setIsDialogOpen] = useState();
   const { fetchRecommendations } = useMovieContext();
 
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-  };
-
   return (
-    <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-      <DialogTrigger asChild>
+    <Dialog open={isDialogOpen} onOpenChange={(open) => setIsDialogOpen(open)}>
+      <DialogTrigger>
         <Button>Search</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
