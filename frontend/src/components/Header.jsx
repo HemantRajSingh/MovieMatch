@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Search } from './Search';
 
 const Header = () => {
@@ -9,29 +10,44 @@ const Header = () => {
           aria-label="Global"
         >
           <div class="flex lg:flex-1">
-            <a href="#" class="-m-1.5 p-1.5">
+            <Link to="/" class="-m-1.5 p-1.5">
               <span class="sr-only">Movie Match</span>
               <h2 class="h-8 w-auto text-3xl font-bold">
                 Moive<span className="text-red-600">Match</span>
               </h2>
-            </a>
+            </Link>
           </div>
           <div class="hidden lg:flex lg:gap-x-12">
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+            <Link
+              to="/new"
+              class="text-sm font-semibold leading-6 text-gray-900"
+            >
               New
-            </a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+            </Link>
+            <Link
+              to="/trending"
+              class="text-sm font-semibold leading-6 text-gray-900"
+            >
               Trending
-            </a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+            </Link>
+            <Link
+              to="/popular"
+              class="text-sm font-semibold leading-6 text-gray-900"
+            >
               Popular
-            </a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+            </Link>
+            <Link
+              to="/top-rated"
+              class="text-sm font-semibold leading-6 text-gray-900"
+            >
               Top Rated
-            </a>
-            <a href="#" class="text-sm font-semibold leading-6 text-gray-900">
+            </Link>
+            <Link
+              to="/browse"
+              class="text-sm font-semibold leading-6 text-gray-900"
+            >
               Browse
-            </a>
+            </Link>
           </div>
           <div class="hidden lg:flex lg:flex-1 lg:justify-end">
             <Search />
