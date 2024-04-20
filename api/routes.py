@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify 
 from flask_cors import CORS
+from flask import Response
 
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -77,33 +78,35 @@ def get_recommendations():
 
     cosine_similarities = cosine_similarity([user_input_embeddings], movie_embeddings).flatten()
     similar_movies_indices = cosine_similarities.argsort()[:-10:-1]
-    return df.iloc[similar_movies_indices].to_json(orient='records')
+    return Response(df.iloc[similar_movies_indices].to_json(orient='records'), mimetype='application/json')
 
 @app.route('/browse/', methods=['GET'])
 def browse_movies():
-    return jsonify(df[:60].to_dict('records'))
+    return Response(df[:60].to_json(orient="records"), mimetype='application/json')
 
 @app.route('/top_rated_movies/', methods=['GET'])
 def top_rated_movies():
     top_rated = df.sort_values(by='rating', ascending=False).head(10)
-    return jsonify(top_rated[:60].to_dict('records'))
+    return Response(top_rated[:60].to_json(orient='records'), mimetype='application/json')
 
 @app.route('/latest_movies/', methods=['GET'])
 def latest_movies():
     latest = df.sort_values(by='year', ascending=False).head(10)
-    return jsonify(latest[:60].to_dict('records'))
+    return Response(latest[:60].to_json(orient='records'), minetype='application/json')
 
 @app.route('/popular_movies/', methods=['GET'])
 def popular_movies():
     popular = df.sort_values(by='rating_count', ascending=False).head(10)
-    return jsonify(df[:60].to_dict('records'))
+    return Response(popular[:60].to_json(orient='records'), minetype='application/json')
 
 @app.route('/trending_movies/', methods=['GET'])
 def trending_movies():
     # You can implement trending logic based on your criteria
     # For example, movies that gained the most rating counts in the last week
     trending = df.sort_values(by=['year', 'rating_count'], ascending=[False, False]).head(10)
-    return jsonify(trending[:60].to_dict('records'))
+    # convert trending to dictionary and return
+    
+    return Response(trending[:60].to_json(orient='records'), minetype='application/json')
 
 
 if __name__ == '__main__':
