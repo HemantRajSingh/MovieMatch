@@ -61,7 +61,7 @@ def process_query(query):
 
     return tokens
 
-@app.route('/api/select_model', methods=['POST'])
+@app.route('/api/select_model/', methods=['POST'])
 def set_model():
     global model_name
     model = request.json.get('value', 'embeddings')
@@ -79,26 +79,26 @@ def get_recommendations():
     similar_movies_indices = cosine_similarities.argsort()[:-10:-1]
     return df.iloc[similar_movies_indices].to_json(orient='records')
 
-@app.route('/browse', methods=['GET'])
+@app.route('/browse/', methods=['GET'])
 def browse_movies():
     return jsonify(df[:60].to_dict('records'))
 
-@app.route('/top_rated_movies', methods=['GET'])
+@app.route('/top_rated_movies/', methods=['GET'])
 def top_rated_movies():
     top_rated = df.sort_values(by='rating', ascending=False).head(10)
     return jsonify(top_rated[:60].to_dict('records'))
 
-@app.route('/latest_movies', methods=['GET'])
+@app.route('/latest_movies/', methods=['GET'])
 def latest_movies():
     latest = df.sort_values(by='year', ascending=False).head(10)
     return jsonify(latest[:60].to_dict('records'))
 
-@app.route('/popular_movies', methods=['GET'])
+@app.route('/popular_movies/', methods=['GET'])
 def popular_movies():
     popular = df.sort_values(by='rating_count', ascending=False).head(10)
     return jsonify(df[:60].to_dict('records'))
 
-@app.route('/trending_movies', methods=['GET'])
+@app.route('/trending_movies/', methods=['GET'])
 def trending_movies():
     # You can implement trending logic based on your criteria
     # For example, movies that gained the most rating counts in the last week
